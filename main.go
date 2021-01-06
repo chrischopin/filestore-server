@@ -17,6 +17,8 @@ func main() {
 	http.HandleFunc("/file/query", handler.FileQueryHandler)
 	http.HandleFunc("/file/download", handler.DownloadHandler)
 
+	http.HandleFunc("/user/signup", handler.SignUpHandler)
+
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Printf("Failed to server http server, err: %s\n", err.Error())

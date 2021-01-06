@@ -1,8 +1,8 @@
 package meta
 
 import (
-	"sort"
 	mysqldb "filestore-server/db"
+	"sort"
 )
 
 type FileMetadata struct {
@@ -24,12 +24,26 @@ func UpdateFileMetadata(fmeta FileMetadata) {
 }
 
 func UpdateFileMetadataDB(fmeta FileMetadata) bool {
-	return mysqldb.OnFileUploadFinished(fmeta.FileSha1, fmeta.FileName,
+	return mysqldb.OnFileUploadFinishedToDB(fmeta.FileSha1, fmeta.FileName,
 		fmeta.FileSize, fmeta.FileAddr)
 }
 
 func GetFileMeta(filesha1 string) FileMetadata {
 	return fileMetadataStore[filesha1]
+}
+
+func GetFileMetaFromDB(filesha1 string) (FileMetadata, error) {
+	tableFile, err := mysqldb.GetFileMetadataFromDB(filesha1)
+	if err != nil {
+		return FileMetadata{}, err
+	}
+	filemeta := FileMetadata{
+		FileSha1: tableFile.FileHash,
+		FileName: tableFile.FileName.String,
+		FileSize: tableFile.FileSize.Int64,
+		FileAddr: tableFile.FileAddr.String,
+	}
+	return filemeta, nil
 }
 
 func GetLastFileMetadata(count int) []FileMetadata {
